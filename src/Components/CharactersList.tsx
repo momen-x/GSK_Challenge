@@ -30,7 +30,7 @@ const CharactersList = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Adds smooth scrolling
+      behavior: "smooth", 
     });
   };
 
