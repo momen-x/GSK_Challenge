@@ -25,3 +25,8 @@ export interface ICharacterInfo {
   pages: number;
   prev: null | string;
 }
+
+export interface ICharacterResponse {
+  info: ICharacterInfo;
+  results: ICharacter[];
+}

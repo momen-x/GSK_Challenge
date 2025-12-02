@@ -1,9 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import type { ICharacter, ICharacterInfo } from "../Interface/interface";
+import type {
+  ICharacter,
+  ICharacterInfo,
+  ICharacterResponse,
+} from "../Interface/interface";
 import Loading from "./userExperiance/Loading";
 import Error from "./userExperiance/Err";
 import { pageNumberContext } from "../Context/PageNumber.context";
-// import { fetchCharacters } from "../API/getCharacters";
+// import { fetchCharacters } from '../API/getCharacters';
 
 // Design Library
 import {
@@ -21,7 +25,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { domin } from "../Utils/Domin";
 
-const CharactersList = () => {
+const CharactersList = ({
+  searchAboutCharacter,
+  setSearchAboutCharacter,
+}: {
+  searchAboutCharacter: string;
+  setSearchAboutCharacter: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [listOfCharacters, setListOfCharacters] = useState<ICharacter[]>([]);
   const [moreInfo, setMoreInfo] = useState<ICharacterInfo>({
     count: 100,
@@ -53,12 +63,14 @@ const CharactersList = () => {
     }
     setSearchParams({ page: String(pageNumber + 1) });
     scrollToTop();
+    setSearchAboutCharacter("");
   };
   const handlePrev = () => {
     if (moreInfo.prev !== null) {
       setPageNumber(pageNumber - 1);
       setSearchParams({ page: String(pageNumber - 1) });
     }
+    setSearchAboutCharacter("");
     scrollToTop();
   };
 
@@ -84,10 +96,9 @@ const CharactersList = () => {
     // getCharacters();
     const fetchCharacters = async () => {
       try {
-        const response = await axios.get<{
-          info: ICharacterInfo;
-          results: ICharacter[];
-        } | null>(`${domin}/character?page=${pageNumber}`);
+        const response = await axios.get<ICharacterResponse | null>(
+          `${domin}/character?page=${pageNumber}`
+        );
         setListOfCharacters(response.data?.results || []);
         setMoreInfo(
           response.data?.info || {
@@ -120,6 +131,23 @@ const CharactersList = () => {
     }
   }, [searchParams, pageNumber, setPageNumber, moreInfo.pages]);
 
+
+  useEffect(() => {
+    const fetchCharacters = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get<ICharacterResponse | null>(
+          `${domin}/character?name=${searchAboutCharacter}`
+        );
+        setListOfCharacters(response.data?.results || []);
+      } catch (error) {
+        return <Error error={error} />;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCharacters();
+  }, [searchAboutCharacter]);
   if (isLoading) {
     return <Loading />;
   }
@@ -133,6 +161,7 @@ const CharactersList = () => {
         A family of {moreInfo.count} characters, each with a unique , different
         story.{" "}
       </Typography>
+
       <Grid container spacing={2}>
         {listOfCharacters.map((character) => (
           <Grid key={character.id}>
