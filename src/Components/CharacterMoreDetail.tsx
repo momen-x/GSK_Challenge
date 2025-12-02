@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import type { ICharacter } from "../Interface/interface";
+import Loading from "./userExperiance/Loading";
+import Error from "./userExperiance/Err";
+//Design Library
 import {
   Box,
   Typography,
@@ -8,13 +11,14 @@ import {
   Avatar,
   Chip,
   Button,
-  CircularProgress,
   Divider,
   Paper,
   Stack,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-import type { ICharacter } from "../Interface/interface";
+//Extra Library
+import axios from "axios";
+import { domin } from "../Utils/Domin";
 
 const CharacterMoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +32,7 @@ const CharacterMoreDetail = () => {
       try {
         setLoading(true);
         const { data } = await axios.get<ICharacter>(
-          `https://rickandmortyapi.com/api/character/${id}`
+          `${domin}/character/${id}`
         );
         setCharacter(data);
       } catch (err) {
@@ -45,29 +49,13 @@ const CharacterMoreDetail = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="60vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
 
   if (error || !character) {
-    return (
-      <Box textAlign="center" p={4}>
-        <Typography color="error" variant="h6">
-          {error || "Character not found"}
-        </Typography>
-        <Button variant="contained" onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-          Go Back
-        </Button>
-      </Box>
-    );
+    if (error || !character) {
+      return <Error error={error} />;
+    }
   }
   //the design here by chatgpt
   return (

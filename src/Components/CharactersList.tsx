@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import type { ICharacter, ICharacterInfo } from "../Interface/interface";
+import Loading from "./userExperiance/Loading";
+import Error from "./userExperiance/Err";
+import { pageNumberContext } from "../Context/PageNumber.context";
 // import { fetchCharacters } from "../API/getCharacters";
+
+// Design Library
 import {
   Box,
   Card,
@@ -9,11 +14,12 @@ import {
   CardMedia,
   Grid,
   Typography,
-  CircularProgress,
   Button,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+//Extra Library
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import { domin } from "../Utils/Domin";
 
 const CharactersList = () => {
   const [listOfCharacters, setListOfCharacters] = useState<ICharacter[]>([]);
@@ -23,26 +29,35 @@ const CharactersList = () => {
     pages: 0,
     prev: null,
   });
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  // const [pageNumber, setPageNumber] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { pageNumber, setPageNumber } = useContext(pageNumberContext);
+  // console.log("the page number is : ",pageNumber);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isDisapledNextBtn, setIsDispledNextBtn] = useState(false);
+  const [isDisapledPrevBtn, setIsDispledPrevBtn] = useState(false);
+
   const navigate = useNavigate();
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", 
+      behavior: "smooth",
     });
   };
 
   const handleNext = () => {
     if (moreInfo.next !== null) {
-      setPageNumber((prev) => prev + 1);
+      setPageNumber(pageNumber + 1);
     }
+    setSearchParams({ page: String(pageNumber + 1) });
     scrollToTop();
   };
   const handlePrev = () => {
     if (moreInfo.prev !== null) {
-      setPageNumber((prev) => prev - 1);
+      setPageNumber(pageNumber - 1);
+      setSearchParams({ page: String(pageNumber - 1) });
     }
     scrollToTop();
   };
@@ -72,9 +87,7 @@ const CharactersList = () => {
         const response = await axios.get<{
           info: ICharacterInfo;
           results: ICharacter[];
-        } | null>(
-          `https://rickandmortyapi.com/api/character?page=${pageNumber}`
-        );
+        } | null>(`${domin}/character?page=${pageNumber}`);
         setListOfCharacters(response.data?.results || []);
         setMoreInfo(
           response.data?.info || {
@@ -85,25 +98,33 @@ const CharactersList = () => {
           }
         );
       } catch (error) {
+        setError("Failed to load characters list");
         console.error(error);
       } finally {
         setIsLoading(false);
       }
     };
     fetchCharacters();
-  }, [pageNumber]);
+
+    setIsDispledNextBtn(moreInfo.next === null);
+    setIsDispledPrevBtn(moreInfo.prev === null);
+  }, [pageNumber, moreInfo.next, moreInfo.prev]);
+  useEffect(() => {
+    if (Number(searchParams.get("page"))) {
+      const num = Number(searchParams.get("page"));
+      if (num > 0 && num <= moreInfo.pages) {
+        setPageNumber(num);
+      } else {
+        setPageNumber(1);
+      }
+    }
+  }, [searchParams, pageNumber, setPageNumber, moreInfo.pages]);
 
   if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
+  }
+  if (error || !CharactersList) {
+    return <Error error={error} />;
   }
 
   return (
@@ -197,9 +218,9 @@ const CharactersList = () => {
         <Button
           size="small"
           onClick={handlePrev}
-          disabled={moreInfo.prev === null}
+          disabled={isDisapledPrevBtn}
           sx={{ minWidth: 40 }}
-          variant={moreInfo.prev === null ? "outlined" : "contained"}
+          variant={isDisapledPrevBtn ? "outlined" : "contained"}
         >
           ←
         </Button>
@@ -211,9 +232,9 @@ const CharactersList = () => {
         <Button
           size="small"
           onClick={handleNext}
-          disabled={moreInfo.next === null}
+          disabled={isDisapledNextBtn}
           sx={{ minWidth: 40 }}
-          variant={moreInfo.next === null ? "outlined" : "contained"}
+          variant={isDisapledNextBtn ? "outlined" : "contained"}
         >
           →
         </Button>

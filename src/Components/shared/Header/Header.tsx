@@ -11,8 +11,9 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Box } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { pageNumberContext } from "../../../Context/PageNumber.context";
 interface Page {
   path: string;
   Icon: React.ReactNode;
@@ -21,6 +22,7 @@ interface Page {
 
 const Headder = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const { pageNumber } = useContext(pageNumberContext);
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -40,7 +42,7 @@ const Headder = () => {
     {
       Icon: <Diversity1Icon />,
       name: "Characters",
-      path: "/characters",
+      path: `/characters?page=${pageNumber}`,
     },
   ];
   return (
@@ -48,27 +50,23 @@ const Headder = () => {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-         <Link to={"/"} style={{ textDecorationLine:'none',color:'white' }}>
-        
-          <Typography
-            variant="h6"
-            noWrap
-            
-          
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-
-            LOGO
-          </Typography>
- </Link>
+          <Link to={"/"} style={{ textDecorationLine: "none", color: "white" }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              LOGO
+            </Typography>
+          </Link>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"

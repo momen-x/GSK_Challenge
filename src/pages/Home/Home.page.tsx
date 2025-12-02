@@ -7,8 +7,19 @@ import {
   Chip,
   Stack,
   Paper,
+  CardMedia,
 } from "@mui/material";
-import { Email, GitHub, LinkedIn, Phone, Code } from "@mui/icons-material";
+import {
+  Email,
+  GitHub,
+  LinkedIn,
+  Phone,
+  Code,
+  Article,
+} from "@mui/icons-material";
+
+//
+import portofoliLogo from "../../assets/portfolio.jpg";
 const Home = () => {
   return (
     <Box>
@@ -56,7 +67,6 @@ const Home = () => {
                   />
                 </Stack>
 
-                {/* Social Links */}
                 <Stack direction="row" spacing={2}>
                   <IconButton
                     color="primary"
@@ -71,7 +81,7 @@ const Home = () => {
                   </IconButton>
                   <IconButton
                     color="primary"
-                    href="https://www.linkedin.com/in/mo%E2%80%99men-alswafiri-8b6491346?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+                    href="https://www.linkedin.com/in/mo%E2%80%99men-alswafiri-8b6491346"
                     target="_blank"
                     sx={{
                       bgcolor: "primary.light",
@@ -79,6 +89,18 @@ const Home = () => {
                     }}
                   >
                     <LinkedIn />
+                  </IconButton>
+                  <IconButton
+                    color="primary"
+                    href="https://protoflio-opal.vercel.app"
+                    target="_blank"
+                    sx={{
+                      bgcolor: "primary.light",
+                      "&:hover": { bgcolor: "primary.main", color: "white" },
+                    }}
+                  >
+                    {/* <CardMedia src={portofoliLogo} sx={{ width:"80px" }} />  */}
+                    <Article />
                   </IconButton>
                 </Stack>
               </Grid>

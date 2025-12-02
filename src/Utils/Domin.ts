@@ -1,0 +1,1 @@
+export  const domin="https://rickandmortyapi.com/api";
