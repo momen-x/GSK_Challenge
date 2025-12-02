@@ -28,7 +28,15 @@ const CharacterMoreDetail = () => {
   }
 
   if (error || !character) {
-    return <Error error={error ? error.message : "Character not found"} />;
+    return (
+      <Error
+        error={
+          error && error.message === "Request failed with status code 404"
+            ? "this character doesn't exist"
+            : "some thing went wrong"
+        }
+      />
+    );
   }
 
   if (!character) {

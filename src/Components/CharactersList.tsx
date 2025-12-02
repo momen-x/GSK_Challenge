@@ -79,7 +79,15 @@ const CharactersList = ({
     return <Loading />;
   }
   if (error || !CharactersList) {
-    return <Error error={error ? error.message : "Characters not found"} />;
+    return (
+      <Error
+        error={
+          error && error.message === "Request failed with status code 404"
+            ? "this character doesn't exist"
+            : "some thing went wrong"
+        }
+      />
+    );
   }
 
   return (
