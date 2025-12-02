@@ -19,7 +19,6 @@ export const characterApi = {
     return data;
   },
 
-  // display episodes 
   getEpisodes: async (episodeUrls: string[]) => {
     const episodeIds = episodeUrls.map((url) => url.split("/").pop());
     const episodeRequests = episodeIds.map((id) =>
