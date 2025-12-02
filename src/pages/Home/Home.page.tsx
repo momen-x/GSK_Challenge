@@ -7,7 +7,7 @@ import {
   Chip,
   Stack,
   Paper,
-  CardMedia,
+  // CardMedia,
 } from "@mui/material";
 import {
   Email,
@@ -19,7 +19,7 @@ import {
 } from "@mui/icons-material";
 
 //
-import portofoliLogo from "../../assets/portfolio.jpg";
+// import portofoliLogo from "../../assets/portfolio.jpg";
 const Home = () => {
   return (
     <Box>
