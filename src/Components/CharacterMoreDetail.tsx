@@ -23,14 +23,16 @@ const CharacterMoreDetail = () => {
   const navigate = useNavigate();
   const { data: character, isLoading, error } = useCharacter(id);
 
-
-
   if (isLoading) {
     return <Loading />;
   }
 
   if (error || !character) {
-    return <Error error={error} />;
+    return <Error error={error ? error.message : "Character not found"} />;
+  }
+
+  if (!character) {
+    return <Error error={"Character not found"} />;
   }
 
   return (

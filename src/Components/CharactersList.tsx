@@ -79,7 +79,7 @@ const CharactersList = ({
     return <Loading />;
   }
   if (error || !CharactersList) {
-    return <Error error={error} />;
+    return <Error error={error ? error.message : "Characters not found"} />;
   }
 
   return (
