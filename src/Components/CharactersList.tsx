@@ -1,13 +1,7 @@
-import { useEffect, useState, useContext } from "react";
-import type {
-  ICharacter,
-  ICharacterInfo,
-  ICharacterResponse,
-} from "../Interface/interface";
+import { useEffect, useState } from "react";
+
 import Loading from "./userExperiance/Loading";
 import Error from "./userExperiance/Err";
-import { pageNumberContext } from "../Context/PageNumber.context";
-// import { fetchCharacters } from '../API/getCharacters';
 
 // Design Library
 import {
@@ -22,8 +16,7 @@ import {
 } from "@mui/material";
 //Extra Library
 import { useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
-import { domin } from "../Utils/Domin";
+import { useCharacters, useSearchCharacters } from "../hooks/useCharacters";
 
 const CharactersList = ({
   searchAboutCharacter,
@@ -32,23 +25,18 @@ const CharactersList = ({
   searchAboutCharacter: string;
   setSearchAboutCharacter: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [listOfCharacters, setListOfCharacters] = useState<ICharacter[]>([]);
-  const [moreInfo, setMoreInfo] = useState<ICharacterInfo>({
-    count: 100,
-    next: null,
-    pages: 0,
-    prev: null,
-  });
-  // const [pageNumber, setPageNumber] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { pageNumber, setPageNumber } = useContext(pageNumberContext);
-  // console.log("the page number is : ",pageNumber);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isDisapledNextBtn, setIsDispledNextBtn] = useState(false);
-  const [isDisapledPrevBtn, setIsDispledPrevBtn] = useState(false);
-
   const navigate = useNavigate();
+  // const [listOfCharacters, setListOfCharacters] = useState<ICharacter[]>([]);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const isSearching = searchAboutCharacter.length > 0;
+  const charactersQuery = useCharacters(pageNumber);
+  const searchQuery = useSearchCharacters(searchAboutCharacter);
+
+  const activeQuery = isSearching ? searchQuery : charactersQuery;
+  const { data, isLoading, error } = activeQuery;
+  const listOfCharacters = data?.results || [];
+  const moreInfo = data?.info || { count: 0, next: null, pages: 0, prev: null };
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -75,79 +63,18 @@ const CharactersList = ({
   };
 
   useEffect(() => {
-    // const getCharacters = async () => {
-    //   try {
-    //     const data = await fetchCharacters();
-    //     setListOfCharacters(data?.results || []);
-    //     setMoreInfo(
-    //       data?.info || {
-    //         count: 100,
-    //         next: null,
-    //         pages: 0,
-    //         prev: null,
-    //       }
-    //     );
-    //   } catch (error) {
-    //     console.log(error);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // getCharacters();
-    const fetchCharacters = async () => {
-      try {
-        const response = await axios.get<ICharacterResponse | null>(
-          `${domin}/character?page=${pageNumber}`
-        );
-        setListOfCharacters(response.data?.results || []);
-        setMoreInfo(
-          response.data?.info || {
-            count: 100,
-            next: null,
-            pages: 0,
-            prev: null,
-          }
-        );
-      } catch (error) {
-        setError("Failed to load characters list");
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCharacters();
-
-    setIsDispledNextBtn(moreInfo.next === null);
-    setIsDispledPrevBtn(moreInfo.prev === null);
-  }, [pageNumber, moreInfo.next, moreInfo.prev]);
-  useEffect(() => {
-    if (Number(searchParams.get("page"))) {
-      const num = Number(searchParams.get("page"));
+    const pageParam = searchParams.get("page");
+    if (pageParam) {
+      const num = Number(pageParam);
       if (num > 0 && num <= moreInfo.pages) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPageNumber(num);
       } else {
         setPageNumber(1);
       }
     }
-  }, [searchParams, pageNumber, setPageNumber, moreInfo.pages]);
+  }, [searchParams, moreInfo.pages]);
 
-
-  useEffect(() => {
-    const fetchCharacters = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get<ICharacterResponse | null>(
-          `${domin}/character?name=${searchAboutCharacter}`
-        );
-        setListOfCharacters(response.data?.results || []);
-      } catch (error) {
-        return <Error error={error} />;
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCharacters();
-  }, [searchAboutCharacter]);
   if (isLoading) {
     return <Loading />;
   }
@@ -247,9 +174,9 @@ const CharactersList = ({
         <Button
           size="small"
           onClick={handlePrev}
-          disabled={isDisapledPrevBtn}
+          disabled={moreInfo.prev === null}
           sx={{ minWidth: 40 }}
-          variant={isDisapledPrevBtn ? "outlined" : "contained"}
+          variant={moreInfo.prev === null ? "outlined" : "contained"}
         >
           ←
         </Button>
@@ -261,9 +188,9 @@ const CharactersList = ({
         <Button
           size="small"
           onClick={handleNext}
-          disabled={isDisapledNextBtn}
+          disabled={moreInfo.next === null}
           sx={{ minWidth: 40 }}
-          variant={isDisapledNextBtn ? "outlined" : "contained"}
+          variant={moreInfo.next === null ? "outlined" : "contained"}
         >
           →
         </Button>

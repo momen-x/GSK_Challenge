@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import type { ICharacter } from "../Interface/interface";
 import Loading from "./userExperiance/Loading";
 import Error from "./userExperiance/Err";
+import ListOfThEepisodesSharedByCharactters from "./ListOfThEepisodesSharedByCharactters";
+import { useCharacter } from "../hooks/useCharacters";
 //Design Library
 import {
   Box,
@@ -16,52 +15,29 @@ import {
   Stack,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-//Extra Library
-import axios from "axios";
-import { domin } from "../Utils/Domin";
+//Extra library
+import { useParams, useNavigate } from "react-router-dom";
 
 const CharacterMoreDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [character, setCharacter] = useState<ICharacter | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: character, isLoading, error } = useCharacter(id);
 
-  useEffect(() => {
-    const fetchCharacter = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get<ICharacter>(
-          `${domin}/character/${id}`
-        );
-        setCharacter(data);
-      } catch (err) {
-        setError("Failed to load character details");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    if (id) {
-      fetchCharacter();
-    }
-  }, [id]);
 
-  if (loading) {
+  if (isLoading) {
     return <Loading />;
   }
 
   if (error || !character) {
-    if (error || !character) {
-      return <Error error={error} />;
-    }
+    return <Error error={error} />;
   }
-  //the design here by chatgpt
+
   return (
-    <Box sx={{ maxWidth: 900, margin: "auto", p: { xs: 2, md: 4 } }}>
+    <Box sx={{ p: 4, maxWidth: 1200, mx: "auto" }}>
       {/* Back Button */}
       <Button
+        variant="outlined"
         startIcon={<ArrowBack />}
         onClick={() => navigate(-1)}
         sx={{ mb: 3 }}
@@ -69,140 +45,107 @@ const CharacterMoreDetail = () => {
         Back to Characters
       </Button>
 
-      <Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden" }}>
-        <Grid container>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Grid container spacing={4}>
           {/* Character Image */}
           <Grid>
-            <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
-              <Avatar
-                src={character.image}
-                alt={character.name}
-                sx={{
-                  width: 300,
-                  height: 300,
-                  borderRadius: 2,
-                  border: "4px solid #f5f5f5",
-                }}
-                variant="rounded"
-              />
-            </Box>
+            <Avatar
+              src={character.image}
+              alt={character.name}
+              sx={{
+                width: "100%",
+                height: "auto",
+                aspectRatio: "1/1",
+                borderRadius: 2,
+              }}
+            />
           </Grid>
 
           {/* Character Details */}
           <Grid>
-            <Box sx={{ p: 3 }}>
-              {/* Name and Status */}
-              <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-                <Typography variant="h4" component="h1" fontWeight="bold">
-                  {character.name}
-                </Typography>
-                <Chip
-                  label={character.status}
-                  color={
-                    character.status === "Alive"
-                      ? "success"
-                      : character.status === "Dead"
-                      ? "error"
-                      : "warning"
-                  }
-                  size="medium"
-                />
-              </Stack>
+            {/* Name and Status */}
+            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+              <Typography variant="h3" component="h1">
+                {character.name}
+              </Typography>
+              <Chip
+                label={character.status}
+                color={
+                  character.status === "Alive"
+                    ? "success"
+                    : character.status === "Dead"
+                    ? "error"
+                    : "default"
+                }
+              />
+            </Stack>
 
-              {/* Basic Info Grid */}
-              <Grid container spacing={3} mb={3}>
-                <Grid>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Species
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {character.species}
-                  </Typography>
-                </Grid>
-                <Grid>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Gender
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {character.gender}
-                  </Typography>
-                </Grid>
-                {character.type && (
-                  <Grid>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Type
-                    </Typography>
-                    <Typography variant="body1" fontWeight="medium">
-                      {character.type}
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
+            <Divider sx={{ my: 2 }} />
 
-              <Divider sx={{ my: 2 }} />
-
-              {/* Origin and Location */}
-              <Grid container spacing={3} mb={3}>
-                <Grid>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Origin
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {character.origin.name}
-                  </Typography>
-                </Grid>
-                <Grid>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Current Location
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {character.location.name}
-                  </Typography>
-                </Grid>
-              </Grid>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Episodes */}
-              <Box mb={3}>
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  Episodes Appeared In
-                </Typography>
-                <Chip
-                  label={`${character.episode.length} episodes`}
-                  variant="outlined"
-                  color="primary"
-                />
-                {character.episode.length > 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    First episode: {character.episode[0].split("/").pop()}
-                  </Typography>
-                )}
-              </Box>
-
-              {/* Additional Info */}
-              <Box>
+            {/* Basic Info Grid */}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Additional Information
+                  Species
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Character ID: {character.id}
+                <Typography variant="body1">{character.species}</Typography>
+              </Grid>
+              <Grid>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Gender
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Created: {new Date(character.created).toLocaleDateString()}
+                <Typography variant="body1">{character.gender}</Typography>
+              </Grid>
+              {character.type && (
+                <Grid>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Type
+                  </Typography>
+                  <Typography variant="body1">{character.type}</Typography>
+                </Grid>
+              )}
+            </Grid>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Origin and Location */}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Origin
                 </Typography>
-              </Box>
+                <Typography variant="body1">{character.origin.name}</Typography>
+              </Grid>
+              <Grid>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Current Location
+                </Typography>
+                <Typography variant="body1">
+                  {character.location.name}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Additional Info */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Additional Information
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Character ID: {character.id}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Created: {new Date(character.created).toLocaleDateString()}
+              </Typography>
             </Box>
           </Grid>
         </Grid>
+
+        {/* Episodes Section */}
+        <Divider sx={{ my: 4 }} />
+        <ListOfThEepisodesSharedByCharactters episode={character.episode} />
       </Paper>
     </Box>
   );

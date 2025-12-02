@@ -1,4 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import CharactersList from "../../Components/CharactersList";
 import { useState } from "react";
 
@@ -26,18 +26,12 @@ const Characters = () => {
           onChange={(e) => setSearchAboutCharacter(e.target.value)}
           variant="filled"
         />
-        <Button
-          variant="contained"
-          color="info"
-          sx={{ mx: "5px" }}
-          // onClick={handleSearch}
-        >
-          {" "}
-          Search{" "}
-        </Button>
       </Box>
 
       <div>
+        {searchAboutCharacter.length > 0 && (
+          <Typography> the result of {searchAboutCharacter}</Typography>
+        )}
         <CharactersList
           searchAboutCharacter={searchAboutCharacter}
           setSearchAboutCharacter={setSearchAboutCharacter}

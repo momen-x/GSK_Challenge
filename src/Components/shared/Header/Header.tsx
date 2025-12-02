@@ -11,9 +11,8 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Box } from "@mui/material";
-import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { pageNumberContext } from "../../../Context/PageNumber.context";
+import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 interface Page {
   path: string;
   Icon: React.ReactNode;
@@ -22,8 +21,9 @@ interface Page {
 
 const Headder = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
-  const { pageNumber } = useContext(pageNumberContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const currentPage = searchParams.get("page") || "1";
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -42,7 +42,7 @@ const Headder = () => {
     {
       Icon: <Diversity1Icon />,
       name: "Characters",
-      path: `/characters?page=${pageNumber}`,
+      path: `/characters?page=${currentPage}`,
     },
   ];
   return (
