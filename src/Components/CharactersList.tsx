@@ -47,7 +47,7 @@ const CharactersList = ({
 
   const handleNext = () => {
     if (moreInfo.next !== null) {
-      setPageNumber(pageNumber + 1);
+      setPageNumber((prev) => prev + 1);
     }
     setSearchParams({ page: String(pageNumber + 1) });
     scrollToTop();
@@ -55,7 +55,7 @@ const CharactersList = ({
   };
   const handlePrev = () => {
     if (moreInfo.prev !== null) {
-      setPageNumber(pageNumber - 1);
+      setPageNumber((prev) => prev - 1);
       setSearchParams({ page: String(pageNumber - 1) });
     }
     setSearchAboutCharacter("");
@@ -63,17 +63,23 @@ const CharactersList = ({
   };
 
   useEffect(() => {
+    // console.log("turn on");
     const pageParam = searchParams.get("page");
+    if (isNaN(Number(pageParam))) {
+      setSearchParams({ page: "1" });
+      return;
+    }
+
     if (pageParam) {
       const num = Number(pageParam);
-      if (num > 0 && num <= moreInfo.pages) {
+      const validPage = num > 0 ? num : 1;
+
+      if (validPage !== pageNumber) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPageNumber(num);
-      } else {
-        setPageNumber(1);
+        setPageNumber(validPage);
       }
     }
-  }, [searchParams, moreInfo.pages]);
+  }, [searchParams]);
 
   if (isLoading) {
     return <Loading />;

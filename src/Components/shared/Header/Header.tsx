@@ -12,18 +12,15 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Box } from "@mui/material";
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 interface Page {
   path: string;
   Icon: React.ReactNode;
   name: string;
 }
-
 const Headder = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const currentPage = searchParams.get("page") || "1";
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -32,6 +29,7 @@ const Headder = () => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
 
   const pages: Page[] = [
     {
@@ -42,7 +40,7 @@ const Headder = () => {
     {
       Icon: <Diversity1Icon />,
       name: "Characters",
-      path: `/characters?page=${currentPage}`,
+      path: `/characters?page=1`,
     },
   ];
   return (
