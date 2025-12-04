@@ -37,7 +37,8 @@ const CharactersList = ({
   const { data, isLoading, error } = activeQuery;
   const listOfCharacters = data?.results || [];
   const moreInfo = data?.info || { count: 0, next: null, pages: 0, prev: null };
-
+  const maxPage = 42;
+  // const maxPage = moreInfo.pages;
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -62,24 +63,51 @@ const CharactersList = ({
     scrollToTop();
   };
 
-  useEffect(() => {
-    // console.log("turn on");
-    const pageParam = searchParams.get("page");
-    if (isNaN(Number(pageParam))) {
-      setSearchParams({ page: "1" });
-      return;
-    }
+//   useEffect(() => {
+//  console.log("first")
+//  console.log("the list of data is : ", listOfCharacters);
+//  console.log("the pages info is : ", moreInfo);
+//     const pageParam = searchParams.get("page");
+//     if (isNaN(Number(pageParam))) {
+//       setSearchParams({ page: "1" });
+//       return;
+//     }
 
-    if (pageParam) {
-      const num = Number(pageParam);
-      const validPage = num > 0 ? num : 1;
+//     if (pageParam) {
+//       const num = Number(pageParam);
 
-      if (validPage !== pageNumber) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPageNumber(validPage);
-      }
-    }
-  }, [searchParams]);
+//       const validPage = num > 0  ? num : 1;
+
+//       if (validPage !== pageNumber) {
+//         // eslint-disable-next-line react-hooks/set-state-in-effect
+//         setPageNumber(validPage);
+//       }
+//     }
+//   }, [searchParams]);
+
+useEffect(() => {
+  const pageParam = searchParams.get("page");
+  
+  if (!pageParam) {
+    setSearchParams({ page: "1" });
+    return;
+  }
+
+  const num = Number(pageParam);
+  
+  // Handle non-numeric values
+  if (isNaN(num) || num < 1|| num > maxPage) {
+    setSearchParams({ page: "1" });
+    return;
+  }
+
+  // Update page number if different
+  if (num !== pageNumber) {
+    setPageNumber(num);
+  }
+}, [searchParams]);
+
+
 
   if (isLoading) {
     return <Loading />;
@@ -89,7 +117,7 @@ const CharactersList = ({
       <Error
         error={
           error && error.message === "Request failed with status code 404"
-            ? "this character doesn't exist"
+            ? "the character you are looking for doesn't exist, try again with another name"
             : "some thing went wrong"
         }
       />

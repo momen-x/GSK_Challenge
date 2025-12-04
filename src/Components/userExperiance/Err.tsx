@@ -9,11 +9,9 @@ const Error = ({ error }: { error: string }) => {
       <Typography color="error" variant="h6">
         {typeof error === "string" ? error : "An error occurred"}
       </Typography>
-      <Button variant="contained" onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-        Go Back
-      </Button>
+
       <Button
-        variant="outlined"
+        variant="contained"
         onClick={() => navigate("/home")}
         sx={{ mt: 2, mx: 2 }}
       >

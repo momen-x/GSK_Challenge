@@ -13,7 +13,7 @@ const Footer = () => {
             <span
               style={{ color: "orange", fontSize: "large", fontWeight: "900" }}
             >
-              eCom.
+              GSG. {"  "}
             </span>
             All rights reserved.
           </p>
