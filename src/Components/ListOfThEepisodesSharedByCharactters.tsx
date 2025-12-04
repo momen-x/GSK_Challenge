@@ -1,4 +1,3 @@
-
 import {
   Box,
   List,
@@ -10,21 +9,28 @@ import {
 import Loading from "./userExperiance/Loading";
 import { useEpisodes } from "../hooks/useCharacters";
 
-
-
 const ListOfThEepisodesSharedByCharactters = ({
   episode,
 }: {
   episode: string[];
 }) => {
-
-  const { data: episodes, isLoading: loadingEpisodes } = useEpisodes(
-    episode || []
-  );
+  const {
+    data: episodes,
+    isLoading: loadingEpisodes,
+    error,
+  } = useEpisodes(episode || []);
   if (loadingEpisodes) {
     return <Loading />;
   }
-
+  if (error) {
+    return (
+      <>
+        <Typography>some thing went wrong</Typography>
+        <Typography>{error.message}</Typography>
+        <Typography>Data display failed</Typography>
+      </>
+    );
+  }
 
   return (
     <Box>

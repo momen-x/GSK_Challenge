@@ -30,3 +30,13 @@ export interface ICharacterResponse {
   info: ICharacterInfo;
   results: ICharacter[];
 }
+
+export interface IEpisode {
+  id: number;
+  name: string;
+  air_date: string;
+  episode: string;
+  characters: string[];
+  url: string;
+  created: Date;
+}

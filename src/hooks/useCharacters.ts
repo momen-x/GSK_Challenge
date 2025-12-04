@@ -5,8 +5,8 @@ export const useCharacters = (page: number) => {
   return useQuery({
     queryKey: ["characters", page],
     queryFn: () => characterApi.getCharacters(page),
-    staleTime: 2 * 60 * 1000, 
-    gcTime: 8 * 60 * 1000, 
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 
@@ -14,8 +14,8 @@ export const useSearchCharacters = (searchTerm: string) => {
   return useQuery({
     queryKey: ["characters", "search", searchTerm],
     queryFn: () => characterApi.searchCharacters(searchTerm),
-    enabled: searchTerm.length > 0, 
-    staleTime: 2 * 60 * 1000,
+    enabled: searchTerm.length > 0,
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -24,8 +24,8 @@ export const useCharacter = (id: string | undefined) => {
   return useQuery({
     queryKey: ["character", id],
     queryFn: () => characterApi.getCharacterById(id!),
-    enabled: !!id, 
-    staleTime: 2 * 60 * 1000,
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -34,6 +34,6 @@ export const useEpisodes = (episodeUrls: string[]) => {
     queryKey: ["episodes", episodeUrls],
     queryFn: () => characterApi.getEpisodes(episodeUrls),
     enabled: episodeUrls.length > 0,
-    staleTime: 8 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
   });
 };

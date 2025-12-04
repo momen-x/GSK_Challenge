@@ -33,12 +33,16 @@ const CharactersList = ({
   const charactersQuery = useCharacters(pageNumber);
   const searchQuery = useSearchCharacters(searchAboutCharacter);
 
+  //to determine which query to use based on the search state (useCharacters or useSearchCharacters)
   const activeQuery = isSearching ? searchQuery : charactersQuery;
   const { data, isLoading, error } = activeQuery;
+
   const listOfCharacters = data?.results || [];
   const moreInfo = data?.info || { count: 0, next: null, pages: 0, prev: null };
-  const maxPage = 42;
-  // const maxPage = moreInfo.pages;
+  // const maxPage = moreInfo.pages => the first time = 0 ._, ;
+  const maxPage = 42;// this value from responce => postman 
+  
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -63,51 +67,26 @@ const CharactersList = ({
     scrollToTop();
   };
 
-//   useEffect(() => {
-//  console.log("first")
-//  console.log("the list of data is : ", listOfCharacters);
-//  console.log("the pages info is : ", moreInfo);
-//     const pageParam = searchParams.get("page");
-//     if (isNaN(Number(pageParam))) {
-//       setSearchParams({ page: "1" });
-//       return;
-//     }
+  useEffect(() => {
+    const pageParam = searchParams.get("page");
 
-//     if (pageParam) {
-//       const num = Number(pageParam);
+    if (!pageParam) {
+      setSearchParams({ page: "1" });
+      return;
+    }
 
-//       const validPage = num > 0  ? num : 1;
+    const num = Number(pageParam);
 
-//       if (validPage !== pageNumber) {
-//         // eslint-disable-next-line react-hooks/set-state-in-effect
-//         setPageNumber(validPage);
-//       }
-//     }
-//   }, [searchParams]);
+    if (isNaN(num) || num < 1 || num > maxPage) {
+      setSearchParams({ page: "1" });
+      return;
+    }
 
-useEffect(() => {
-  const pageParam = searchParams.get("page");
-  
-  if (!pageParam) {
-    setSearchParams({ page: "1" });
-    return;
-  }
-
-  const num = Number(pageParam);
-  
-  // Handle non-numeric values
-  if (isNaN(num) || num < 1|| num > maxPage) {
-    setSearchParams({ page: "1" });
-    return;
-  }
-
-  // Update page number if different
-  if (num !== pageNumber) {
-    setPageNumber(num);
-  }
-}, [searchParams]);
-
-
+    if (num !== pageNumber) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPageNumber(num);
+    }
+  }, [searchParams]);
 
   if (isLoading) {
     return <Loading />;
